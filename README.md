@@ -6,7 +6,7 @@ It creates the rest as you go.
 
 I just wanted to skip of all the gotchas to test things, but figured should share.
 
-I haven't had time yet to learn like anything about angular and what files I can get rid of so it's HUGE
+I haven't had time yet to learn like anything about angular and what files I can get rid of so it's HUGE. 330mb archive and I think I avoided dev dependencies but w/e - seems to simply work after unzipping, but more important is how anyone can do it:
 
 # How to do it from open source codebases
 
