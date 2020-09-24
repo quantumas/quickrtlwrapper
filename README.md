@@ -1,5 +1,7 @@
 # Quick RTL UI + LND/NEUTRINO LOOP wrapper w/ nwjs for Windows
 
+330 mb https://drive.google.com/file/d/1jXJXQc7lQU2aAfBB575-qypwzPyohg6d/view?usp=sharing too big for github, not enough time yet to do smaller
+
 tldr: I just run RTL.exe which runs all the above
 For now no wallets, macroons, or passwords there except overall default RTL pass `satoshi` that can change in settings.
 It creates the rest as you go.
