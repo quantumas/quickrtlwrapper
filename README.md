@@ -1,3 +1,5 @@
+# This is not safe to use as far as I know, virtually no testing done yet, just a reference for wrapping ideas
+
 # Quick RTL UI + LND/NEUTRINO LOOP wrapper w/ nwjs for Windows
 
 330 mb https://drive.google.com/file/d/1jXJXQc7lQU2aAfBB575-qypwzPyohg6d/view?usp=sharing too big for github, not enough time yet to do smaller
