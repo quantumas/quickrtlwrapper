@@ -6,20 +6,17 @@ This is not safe to use as far as I know, virtually no testing done yet, just a 
 
 786 MB uncompressed
 
-no installation necessary, portable, requires to just run RTL.exe or assemble yourself from parts via instructions below
+no installation necessary, portable
 
+Can either use this to run RTL.exe (pass `satoshi`) or assemble yourself from parts via instructions below
 
 Zip file too big for github: https://drive.google.com/file/d/1pQbQwQPlmzFq9q5CZ73DHw3l2LJWr6F1/view?usp=sharing
 
-tldr: I just run RTL.exe which runs all the above
-
-For now no wallets, macroons, or passwords there except overall default RTL pass `satoshi` that can change in settings.
-
-It creates the rest as you go.
+It lets user set up wallets, macroons, or passwords there, initial default RTL pass `satoshi` was set that can be changed  in settings.
 
 I just wanted to skip of all the gotchas to test things, but figured should share.
 
-I haven't had time yet to learn like anything about angular and what files I can get rid of so it's HUGE. 330mb archive and I think I avoided dev dependencies but w/e - seems to simply work after unzipping, but more important is how anyone can do it:
+I haven't had time yet to learn like anything about angular and what files I can get rid of so it's HUGE. ~300mb archive and I think I avoided dev dependencies but w/e - seems to simply work after unzipping, but more important is how anyone can do it:
 
 # How to do it from open source codebases
 
