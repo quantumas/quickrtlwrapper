@@ -1,8 +1,12 @@
-# This is not safe to use as far as I know, virtually no testing done yet, just a reference for wrapping ideas
+This is not safe to use as far as I know, virtually no testing done yet, just a reference for wrapping ideas
 
 # Quick RTL UI + LND/NEUTRINO LOOP wrapper w/ nwjs for Windows
 
-330 mb https://drive.google.com/file/d/1jXJXQc7lQU2aAfBB575-qypwzPyohg6d/view?usp=sharing too big for github, not enough time yet to do smaller
+285 MB compressed zip file
+786 MB uncompressed
+no installation necessary, portable, requires to just run RTL.exe or assemble yourself from parts via instructions below
+
+Zip file too big for github: https://drive.google.com/file/d/1pQbQwQPlmzFq9q5CZ73DHw3l2LJWr6F1/view?usp=sharing
 
 tldr: I just run RTL.exe which runs all the above
 For now no wallets, macroons, or passwords there except overall default RTL pass `satoshi` that can change in settings.
@@ -167,11 +171,106 @@ const runBackgroundTasks = async () => {
       log(e)
     }
     await new Promise(res => setTimeout(res, 2000))
+const nwin = require('nw.gui').Window.get()
+const { spawn, exec } = require('child_process')
+const fs = require('fs')
+
+const ROOTPATH = nw.App.startPath // nwjs RTL executable path
+const RTL_SETTINGS_PATH = './app/RTL-Config.json'
+const SETTINGS_JSON_PATH = './settings.json'
+
+let WHICH_NETWORK = 'testnet'
+
+// try to read settings otherwise assume testnet and new path
+// if change in path, close app
+
+let abort = false
+let lastPath = ''
+let isMainnet = false
+try {
+  const settings = JSON.parse(fs.readFileSync(SETTINGS_JSON_PATH, 'utf8'))
+  lastPath = settings.lastPath
+  isMainnet = settings.isMainnet
+} catch (e) {
+  abort = true
+}
+
+try {
+  // update settings path
+  fs.writeFileSync(
+    SETTINGS_JSON_PATH,
+    JSON.stringify({ lastPath: ROOTPATH, isMainnet }, null, 2)
+  )
+  if (lastPath !== ROOTPATH) abort = true
+
+  // update rtl config
+  WHICH_NETWORK = isMainnet ? 'mainnet' : WHICH_NETWORK
+  const LND_MACAROON_TESTNET = `\\bin\\lnd_testnet\\data\\chain\\bitcoin\\testnet`
+  const LND_MACAROON_MAINNET = `\\bin\\lnd_mainnet\\data\\chain\\bitcoin\\mainnet`
+  const LND_MACAROON = isMainnet ? LND_MACAROON_MAINNET : LND_MACAROON_TESTNET
+  const rtlConfigText = fs.readFileSync(RTL_SETTINGS_PATH, 'utf8')
+  log(rtlConfigText)
+  const rtlConfig = JSON.parse(rtlConfigText)
+  rtlConfig.nodes[0].Authentication.macaroonPath = ROOTPATH + LND_MACAROON
+  rtlConfig.nodes[0].Settings.channelBackupPath =
+    ROOTPATH + `\\backup\\${WHICH_NETWORK}`
+  fs.writeFileSync(RTL_SETTINGS_PATH, JSON.stringify(rtlConfig, null, 2))
+} catch (e) {
+  log('pathcheck.json error:', e)
+}
+if (abort) {
+  // run restarting via bat file after closing this app
+  ;(async () => {
+    const restartHelper = spawn('cmd.exe', ['/c', 'RESTART_APP.bat'], {
+      detached: true,
+      stdio: 'ignore'
+    })
+    restartHelper.unref()
+    await new Promise(res => setTimeout(res, 100))
+
+    nwin.close()
+  })()
+}
+
+// This runs lnd & loop on launch, kills on exit
+const runBackgroundTasks = async () => {
+  // running these batch files to run other ones
+  // so large amount of text doesn't overflow buffer ever
+  const lnd = exec(`LND${WHICH_NETWORK}.bat`, (err, stdout, stderr) => {
+    if (err) {
+      log('lnd error:', err)
+      return
+    }
+    log('lnd:', stdout)
+  })
+  const loop = exec(`LOOP${WHICH_NETWORK}.bat`, (err, stdout, stderr) => {
+    if (err) {
+      log('loop error:', err)
+      return
+    }
+    log('loop:', stdout)
+  })
+
+  // on window close destroy lnd and loop
+  nwin.on('close', async () => {
+    try {
+      lnd.stdin.pause()
+      spawn('taskkill', ['/pid', lnd.pid, '/f', '/t'])
+    } catch (e) {
+      log(e)
+    }
+    try {
+      loop.stdin.pause()
+      spawn('taskkill', ['/pid', loop.pid, '/f', '/t'])
+    } catch (e) {
+      log(e)
+    }
+    await new Promise(res => setTimeout(res, 500))
     nwin.close(true)
   })
   // bring to front, only this works
   nwin.setAlwaysOnTop(true)
-  await new Promise(res => setTimeout(res, 1000))
+  await new Promise(res => setTimeout(res, 500))
   nwin.setAlwaysOnTop(false)
 }
 runBackgroundTasks()
@@ -282,10 +381,9 @@ PAUSE
 
 `RESTART_APP.bat` - if RTL is missing config settings, this is spawned isolated to reopen the app with new settings applied after ~5 seconds
 ```
-ECHO After 5 seconds restarting the app
-timeout /t 6 /nobreak
+timeout /t 2 /nobreak
 RTL.exe
-PAUSE
+SLEEP 1
 ```
 
 
@@ -315,44 +413,26 @@ maxlogfiles=3
 maxlogfilesize=10
 
 listen=0.0.0.0:9735
-rpclisten=localhost:11009
-restlisten=localhost:8080
+rpclisten=0.0.0.0:11009
+restlisten=0.0.0.0:8080
+tlsextraip=0.0.0.0
+tlsautorefresh=true
 
-debuglevel=info
-
-maxpendingchannels=10
-
+maxpendingchannels=50
 minchansize=50000
-
+stagger-initial-reconnect=true
 max-channel-fee-allocation=1.0
 
 accept-keysend=true
-
 allow-circular-route=true
 
-alias=my_testing_node
-color=#3399FF
-
 [Bitcoin]
-
 bitcoin.active=true
 bitcoin.testnet=true
-bitcoin.mainnet=false
-
 bitcoin.node=neutrino
-
 bitcoin.defaultchanconfs=1
 
 [neutrino]
-
-# Mainnet addpeers
-; neutrino.connect=btcd-mainnet.lightning.computer
-; neutrino.connect=mainnet1-btcd.zaphq.io
-; neutrino.connect=mainnet2-btcd.zaphq.io
-; neutrino.connect=mainnet3-btcd.zaphq.io
-; neutrino.connect=mainnet4-btcd.zaphq.io
-
-# Testnet addpeers
 neutrino.addpeer=btcd-testnet.ion.radar.tech
 neutrino.addpeer=btcd-testnet.lightning.computer
 neutrino.addpeer=lnd.bitrefill.com:18333
@@ -362,24 +442,31 @@ neutrino.addpeer=testnet2-btcd.zaphq.io
 neutrino.addpeer=testnet3-btcd.zaphq.io
 neutrino.addpeer=testnet4-btcd.zaphq.io
 
-# Set fee data URL, change to btc-fee-estimates.json if mainnet
 neutrino.feeurl=https://nodes.lightning.computer/fees/v1/btctestnet-fee-estimates.json
 
 [protocol]
-protocol.wumbo-channels=1
+protocol.wumbo-channels=true
 
 [routing]
-# Set validation of channels off: only if using Neutrino
-routing.assumechanvalid=1
+routing.assumechanvalid=true
 
 [autopilot]
 autopilot.active=false
-autopilot.maxchannels=5
+autopilot.maxchannels=50
 autopilot.allocation=1.0
-autopilot.minchansize=20000
+autopilot.minchansize=200000
+autopilot.maxchansize=16000000
 autopilot.private=false
 autopilot.minconfs=1
-autopilot.conftarget=1
+autopilot.conftarget=2
+
+[routerrpc]
+routerrpc.apriorihopprob=0.5
+routerrpc.aprioriweight=0.75
+routerrpc.attemptcost=10
+routerrpc.maxmchistory=10000
+routerrpc.minrtprob=0.005
+routerrpc.penaltyhalflife=1h0m0s
 ```
 
 loop does similar but as it has to wait for lnd it retries every N seconds (ui wrapper handles its termination)
@@ -405,6 +492,18 @@ lnd.macaroondir=./../lnd_testnet/data/chain/bitcoin/testnet
 lnd.tlspath=./../lnd_testnet/data/tls.cert
 ```
 
+Switching between mainnet or testnet can be done by editing "isMainnet" entry to true or false inside
+
+`settings.json`
+```
+{
+  "lastPath": "SOME_PATH",
+  "isMainnet": false
+}
+```
+
 and basically same thing for w/e other network
 
 Now my goals are to improve on its security and reduce its size if possible.
+
+2020 09 29 - updated the lnd.conf and edited RTL `./controllers/lnd/wallet.js` to add `recovery_window: 20000` for `initwallet` initialized wallets and `unlockwallet` because it wasn't scanning them - issue to address this has been created at RTL github (num 494)
