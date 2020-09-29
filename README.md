@@ -12,9 +12,9 @@ Can either use this to run RTL.exe (pass `satoshi`) or assemble yourself from pa
 
 Zip file too big for github: https://drive.google.com/file/d/1pQbQwQPlmzFq9q5CZ73DHw3l2LJWr6F1/view?usp=sharing
 
-It lets user set up wallets, macroons, or passwords there, initial default RTL pass `satoshi` was set that can be changed  in settings.
+It lets user set everything up through UI, initial default RTL pass `satoshi` was set that can be changed  in settings.
 
-I just wanted to skip of all the gotchas to test things, but figured should share.
+All the paths to macaroons and certs are automatically prepared by using relative paths to where lnd/loop is expected to generate them within the portable folder. I just wanted to skip of all the gotchas to test things, but figured should share.
 
 I haven't had time yet to learn like anything about angular and what files I can get rid of so it's HUGE. ~300mb archive and I think I avoided dev dependencies but w/e - seems to simply work after unzipping, but more important is how anyone can do it:
 
