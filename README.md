@@ -3,13 +3,18 @@ This is not safe to use as far as I know, virtually no testing done yet, just a 
 # Quick RTL UI + LND/NEUTRINO LOOP wrapper w/ nwjs for Windows
 
 285 MB compressed zip file
+
 786 MB uncompressed
+
 no installation necessary, portable, requires to just run RTL.exe or assemble yourself from parts via instructions below
+
 
 Zip file too big for github: https://drive.google.com/file/d/1pQbQwQPlmzFq9q5CZ73DHw3l2LJWr6F1/view?usp=sharing
 
 tldr: I just run RTL.exe which runs all the above
+
 For now no wallets, macroons, or passwords there except overall default RTL pass `satoshi` that can change in settings.
+
 It creates the rest as you go.
 
 I just wanted to skip of all the gotchas to test things, but figured should share.
