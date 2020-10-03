@@ -1,8 +1,10 @@
+https://streamable.com/e/kq81lc
+
 This is not safe to use as far as I know, virtually no testing done yet, just a reference for wrapping ideas
 
 # Quick RTL UI + LND/NEUTRINO LOOP wrapper w/ nwjs for Windows
 
-285 MB compressed zip file
+282 MB compressed zip file
 
 786 MB uncompressed
 
@@ -10,7 +12,7 @@ no installation necessary, portable
 
 Can either use this to run RTL.exe (pass `satoshi`) or assemble yourself from parts via instructions below
 
-Zip file too big for github: https://drive.google.com/file/d/1pQbQwQPlmzFq9q5CZ73DHw3l2LJWr6F1/view?usp=sharing
+Zip file too big for github: https://drive.google.com/file/d/1a-VSgAWe61M3GRymp7YzXpTff4axPyUm/view?usp=sharing
 
 It lets user set everything up through UI, initial default RTL pass `satoshi` was set that can be changed  in settings.
 
@@ -494,6 +496,76 @@ lnd.macaroondir=./../lnd_testnet/data/chain/bitcoin/testnet
 lnd.tlspath=./../lnd_testnet/data/tls.cert
 ```
 
+`RTL/bin/lnd_mainnet/lnd.conf` just needs to have different peers for neutrino client
+```
+[Application Options]
+
+datadir=./data
+adminmacaroonpath=./data/chain/bitcoin/mainnet/admin.macaroon
+readonlymacaroonpath=./data/chain/bitcoin/mainnet/readonly.macaroon
+invoicemacaroonpath=./data/chain/bitcoin/mainnet/invoice.macaroon
+tlscertpath=./data/tls.cert
+tlskeypath=./data/tls.key
+
+logdir=./logs
+maxlogfiles=3
+maxlogfilesize=10
+
+listen=0.0.0.0:9735
+rpclisten=0.0.0.0:11009
+restlisten=0.0.0.0:8080
+tlsextraip=0.0.0.0
+tlsautorefresh=true
+
+maxpendingchannels=50
+minchansize=50000
+stagger-initial-reconnect=true
+max-channel-fee-allocation=1.0
+
+accept-keysend=true
+allow-circular-route=true
+
+[Bitcoin]
+bitcoin.active=true
+bitcoin.mainnet=true
+bitcoin.node=neutrino
+bitcoin.defaultchanconfs=1
+
+[neutrino]
+neutrino.addpeer=btcd-mainnet.lightning.computer
+neutrino.addpeer=mainnet1-btcd.zaphq.io
+neutrino.addpeer=mainnet2-btcd.zaphq.io
+neutrino.addpeer=mainnet3-btcd.zaphq.io
+neutrino.addpeer=mainnet4-btcd.zaphq.io
+neutrino.addpeer=btcd0.lightning.engineering
+
+neutrino.feeurl=https://nodes.lightning.computer/fees/v1/btc-fee-estimates.json
+
+[protocol]
+protocol.wumbo-channels=1
+
+[routing]
+routing.assumechanvalid=1
+
+[autopilot]
+autopilot.active=false
+autopilot.maxchannels=50
+autopilot.allocation=1.0
+autopilot.minchansize=200000
+autopilot.maxchansize=16000000
+autopilot.private=false
+autopilot.minconfs=1
+autopilot.conftarget=2
+
+[routerrpc]
+routerrpc.apriorihopprob=0.5
+routerrpc.aprioriweight=0.75
+routerrpc.attemptcost=10
+routerrpc.maxmchistory=10000
+routerrpc.minrtprob=0.005
+routerrpc.penaltyhalflife=1h0m0s
+```
+
 Switching between mainnet or testnet can be done by editing "isMainnet" entry to true or false inside
 
 `settings.json`
@@ -509,3 +581,5 @@ and basically same thing for w/e other network
 Now my goals are to improve on its security and reduce its size if possible.
 
 2020 09 29 - updated the lnd.conf and edited RTL `./controllers/lnd/wallet.js` to add `recovery_window: 20000` for `initwallet` initialized wallets and `unlockwallet` because it wasn't scanning them - issue to address this has been created at RTL github (num 494)
+
+2020 10 03 - removed alias from default lnd conf, added video, used higher compression for zip file but still big: 282 MB
