@@ -12,7 +12,7 @@ no installation necessary, portable
 
 Can either use this to run RTL.exe (pass `satoshi`) or assemble yourself from parts via instructions below
 
-Zip file too big for github: https://drive.google.com/file/d/1a-VSgAWe61M3GRymp7YzXpTff4axPyUm/view?usp=sharing
+Zip file too big for github: LINK REMOVED BC SO OUTDATED
 
 It lets user set everything up through UI, initial default RTL pass `satoshi` was set that can be changed  in settings.
 
